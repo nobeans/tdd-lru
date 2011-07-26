@@ -64,7 +64,7 @@ public class LruMapTest {
         assertEquals("VALUE2", map.get("KEY2"));
         assertEquals("VALUE3", map.get("KEY3"));
 
-        assertEquals("VALUE1", map.get("KEY1"));
+        map.get("KEY1");
 
         map.put("KEY4", "VALUE4");
         assertEquals(3, map.size());
@@ -73,8 +73,8 @@ public class LruMapTest {
         assertEquals("VALUE3", map.get("KEY3"));
         assertEquals("VALUE4", map.get("KEY4"));
 
-        assertEquals("VALUE1", map.get("KEY1"));
-        assertEquals("VALUE3", map.get("KEY3"));
+        map.get("KEY1");
+        map.get("KEY3");
 
         map.put("KEY5", "VALUE5");
         assertEquals(3, map.size());
