@@ -1,0 +1,8 @@
+/bin
+/work
+classes
+*.class
+classes/*
+.svn
+/build
+/db
