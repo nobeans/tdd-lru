@@ -1,5 +1,7 @@
 package tdd.lru;
 
+import java.math.BigDecimal;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -90,5 +92,24 @@ public class LruMapTest {
     @Test(expected = IllegalArgumentException.class)
     public void 上限が負のマップを作成しようとすると例外をスローする() throws Exception {
         new LruMap<String, String>(-1);
+    }
+
+    @Test
+    public void キーと値にString以外も使える() throws Exception {
+        LruMap<Integer, BigDecimal> map = new LruMap<Integer, BigDecimal>(3);
+        map.put(1, new BigDecimal(1.1));
+        map.put(2, new BigDecimal(2.2));
+        map.put(3, new BigDecimal(3.3));
+        assertEquals(3, map.size());
+        assertEquals(new BigDecimal(1.1), map.get(1));
+        assertEquals(new BigDecimal(2.2), map.get(2));
+        assertEquals(new BigDecimal(3.3), map.get(3));
+
+        map.put(4, new BigDecimal(4.4));
+        assertEquals(3, map.size());
+        assertEquals(null, map.get(1));
+        assertEquals(new BigDecimal(2.2), map.get(2));
+        assertEquals(new BigDecimal(3.3), map.get(3));
+        assertEquals(new BigDecimal(4.4), map.get(4));
     }
 }
