@@ -20,9 +20,16 @@ public class LruMap<K, V> {
     public void put(K key, V value) {
         assert map.size() == keyList.size() : "キーリストとマップのサイズは常に同じ";
         if (size() >= limit) {
-            map.remove(keyList.remove(0));
+            if (!map.containsKey(key)) {
+                map.remove(keyList.remove(0));
+            }
         }
+        updateKey(key);
         map.put(key, value);
+    }
+
+    private void updateKey(K key) {
+        keyList.remove(key);
         keyList.add(key);
     }
 
@@ -31,9 +38,7 @@ public class LruMap<K, V> {
         if (!map.containsKey(key)) {
             return null;
         }
-        assert keyList.contains(key) : "マップに含まれるならばキーリストにも含まれる";
-        keyList.remove(key);
-        keyList.add(key);
+        updateKey(key);
         return map.get(key);
     }
 

@@ -55,7 +55,7 @@ public class LruMapTest {
     }
 
     @Test
-    public void 古いイコール最も参照されなかった要素のこと_参照することで延命される() throws Exception {
+    public void 古いイコール最も参照されなかった要素のこと_getすることで延命される() throws Exception {
         map.put("KEY1", "VALUE1");
         map.put("KEY2", "VALUE2");
         map.put("KEY3", "VALUE3");
@@ -82,6 +82,27 @@ public class LruMapTest {
         assertEquals("VALUE3", map.get("KEY3"));
         assertEquals(null, map.get("KEY4"));
         assertEquals("VALUE5", map.get("KEY5"));
+    }
+
+    @Test
+    public void putの場合も参照したのと同じで延命操作となる() throws Exception {
+        map.put("KEY1", "VALUE1");
+        map.put("KEY2", "VALUE2");
+        map.put("KEY3", "VALUE3");
+        assertEquals(3, map.size());
+
+        map.put("KEY1", "VALUE1");
+        assertEquals(3, map.size());
+        assertEquals("VALUE1", map.get("KEY1")); // 一見何も変わってないように見えるが
+        assertEquals("VALUE2", map.get("KEY2"));
+        assertEquals("VALUE3", map.get("KEY3"));
+
+        map.put("KEY1", "VALUE1");
+        map.put("KEY4", "VALUE4"); // 引き続きKEY4を追加すると
+        assertEquals(3, map.size());
+        assertEquals("VALUE1", map.get("KEY1")); // KEY1を飛ばしてKEY2が削除された
+        assertEquals(null, map.get("KEY2"));
+        assertEquals("VALUE3", map.get("KEY3"));
     }
 
     @Test(expected = IllegalArgumentException.class)
