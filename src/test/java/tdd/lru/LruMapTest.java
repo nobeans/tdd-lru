@@ -41,14 +41,12 @@ public class LruMapTest {
 
         map.put("KEY4", "VALUE4");
         assertEquals(3, map.size());
-        assertEquals(null, map.get("KEY1"));
         assertEquals("VALUE2", map.get("KEY2"));
         assertEquals("VALUE3", map.get("KEY3"));
         assertEquals("VALUE4", map.get("KEY4"));
 
         map.put("KEY5", "VALUE5");
         assertEquals(3, map.size());
-        assertEquals(null, map.get("KEY2"));
         assertEquals("VALUE3", map.get("KEY3"));
         assertEquals("VALUE4", map.get("KEY4"));
         assertEquals("VALUE5", map.get("KEY5"));
@@ -69,7 +67,6 @@ public class LruMapTest {
         map.put("KEY4", "VALUE4");
         assertEquals(3, map.size());
         assertEquals("VALUE1", map.get("KEY1"));
-        assertEquals(null, map.get("KEY2"));
         assertEquals("VALUE3", map.get("KEY3"));
         assertEquals("VALUE4", map.get("KEY4"));
 
@@ -80,7 +77,6 @@ public class LruMapTest {
         assertEquals(3, map.size());
         assertEquals("VALUE1", map.get("KEY1"));
         assertEquals("VALUE3", map.get("KEY3"));
-        assertEquals(null, map.get("KEY4"));
         assertEquals("VALUE5", map.get("KEY5"));
     }
 
@@ -101,8 +97,8 @@ public class LruMapTest {
         map.put("KEY4", "VALUE4"); // 引き続きKEY4を追加すると
         assertEquals(3, map.size());
         assertEquals("VALUE1", map.get("KEY1")); // KEY1を飛ばしてKEY2が削除された
-        assertEquals(null, map.get("KEY2"));
         assertEquals("VALUE3", map.get("KEY3"));
+        assertEquals("VALUE4", map.get("KEY4"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -132,5 +128,56 @@ public class LruMapTest {
         assertEquals(new BigDecimal(2.2), map.get(2));
         assertEquals(new BigDecimal(3.3), map.get(3));
         assertEquals(new BigDecimal(4.4), map.get(4));
+    }
+
+    @Test
+    public void キャッシュのサイズは後から変更できる_減らす() throws Exception {
+        map.put("KEY1", "VALUE1");
+        map.put("KEY2", "VALUE2");
+        map.put("KEY3", "VALUE3");
+        assertEquals(3, map.size());
+        assertEquals("VALUE1", map.get("KEY1"));
+        assertEquals("VALUE2", map.get("KEY2"));
+        assertEquals("VALUE3", map.get("KEY3"));
+
+        map.setLimit(1);
+
+        assertEquals(1, map.size());
+        assertEquals("VALUE3", map.get("KEY3"));
+
+        map.put("KEY4", "VALUE4");
+        assertEquals(1, map.size());
+        assertEquals("VALUE4", map.get("KEY4"));
+    }
+
+    @Test
+    public void キャッシュのサイズは後から変更できる_増やす() throws Exception {
+        map.setLimit(2);
+        map.put("KEY1", "VALUE1");
+        map.put("KEY2", "VALUE2");
+        assertEquals(2, map.size());
+        assertEquals("VALUE1", map.get("KEY1"));
+        assertEquals("VALUE2", map.get("KEY2"));
+
+        map.setLimit(4);
+
+        assertEquals(2, map.size());
+        assertEquals("VALUE1", map.get("KEY1"));
+        assertEquals("VALUE2", map.get("KEY2"));
+
+        map.put("KEY3", "VALUE3");
+        map.put("KEY4", "VALUE4");
+        assertEquals(4, map.size());
+        assertEquals("VALUE1", map.get("KEY1"));
+        assertEquals("VALUE2", map.get("KEY2"));
+        assertEquals("VALUE3", map.get("KEY3"));
+        assertEquals("VALUE4", map.get("KEY4"));
+
+        map.put("KEY5", "VALUE5");
+        assertEquals(4, map.size());
+        assertEquals("VALUE2", map.get("KEY2"));
+        assertEquals("VALUE3", map.get("KEY3"));
+        assertEquals("VALUE4", map.get("KEY4"));
+        assertEquals("VALUE5", map.get("KEY5"));
     }
 }

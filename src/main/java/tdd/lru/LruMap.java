@@ -46,4 +46,16 @@ public class LruMap<K, V> {
         return map.size();
     }
 
+    public void setLimit(int limit) {
+        this.limit = limit;
+        for (int i = 0; i <= size() - limit; i++) {
+            K key = keyList.remove(0);
+            map.remove(key);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s [limit:%d]", map.toString(), limit);
+    }
 }
