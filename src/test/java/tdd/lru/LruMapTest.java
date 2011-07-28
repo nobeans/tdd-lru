@@ -1,6 +1,7 @@
 package tdd.lru;
 
 import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -87,16 +88,16 @@ public class LruMapTest {
         map.put("KEY3", "VALUE3");
         assertEquals(3, map.size());
 
-        map.put("KEY1", "VALUE1");
+        map.put("KEY1", "VALUE1-A");
         assertEquals(3, map.size());
-        assertEquals("VALUE1", map.get("KEY1")); // 一見何も変わってないように見えるが
+        assertEquals("VALUE1-A", map.get("KEY1")); // 一見何も変わってないように見えるが
         assertEquals("VALUE2", map.get("KEY2"));
         assertEquals("VALUE3", map.get("KEY3"));
 
-        map.put("KEY1", "VALUE1");
+        map.put("KEY1", "VALUE1-B"); // (assert時のgetterによって延命順序が変わってるのでもう一度)
         map.put("KEY4", "VALUE4"); // 引き続きKEY4を追加すると
         assertEquals(3, map.size());
-        assertEquals("VALUE1", map.get("KEY1")); // KEY1を飛ばしてKEY2が削除された
+        assertEquals("VALUE1-B", map.get("KEY1")); // KEY1を飛ばしてKEY2が削除された
         assertEquals("VALUE3", map.get("KEY3"));
         assertEquals("VALUE4", map.get("KEY4"));
     }
@@ -179,5 +180,33 @@ public class LruMapTest {
         assertEquals("VALUE3", map.get("KEY3"));
         assertEquals("VALUE4", map.get("KEY4"));
         assertEquals("VALUE5", map.get("KEY5"));
+    }
+
+    @Test
+    public void 要素を削除する() throws Exception {
+        map.put("KEY1", "VALUE1");
+        map.put("KEY2", "VALUE2");
+        map.put("KEY3", "VALUE3");
+        assertEquals(3, map.size());
+        assertEquals("VALUE1", map.get("KEY1"));
+        assertEquals("VALUE2", map.get("KEY2"));
+        assertEquals("VALUE3", map.get("KEY3"));
+
+        assertEquals("VALUE2", map.remove("KEY2"));
+
+        assertEquals(2, map.size());
+        assertEquals("VALUE1", map.get("KEY1"));
+        assertEquals("VALUE3", map.get("KEY3"));
+    }
+
+    @Test
+    public void 時間が経ったら消える() throws Exception {
+        map.put("KEY1", "VALUE1", 100, TimeUnit.MILLISECONDS);
+        map.put("KEY2", "VALUE2", 500, TimeUnit.MILLISECONDS);
+        assertEquals(2, map.size());
+        TimeUnit.MILLISECONDS.sleep(200);
+        assertEquals(1, map.size());
+        TimeUnit.MILLISECONDS.sleep(1000);
+        assertEquals(0, map.size());
     }
 }
